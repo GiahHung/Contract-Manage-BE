@@ -10,11 +10,11 @@ module.exports = (sequelize) => {
   Contract.init(
     {
       contract_code: DataTypes.STRING(50),
-      customer_id: DataTypes.INTEGER,
+      customer: DataTypes.STRING(200),
       employee_id: DataTypes.INTEGER,
       type_id: DataTypes.INTEGER,
+      money: DataTypes.FLOAT,
       title: DataTypes.STRING(200),
-      content: DataTypes.TEXT,
       start_date: DataTypes.DATEONLY,
       end_date: DataTypes.DATEONLY,
       signed_date: DataTypes.DATEONLY,

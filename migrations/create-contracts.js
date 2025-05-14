@@ -14,8 +14,8 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      customer_id: {
-        type: Sequelize.INTEGER,
+      customer: {
+        type: Sequelize.STRING(200),
         allowNull: false,
       },
       employee_id: {
@@ -30,8 +30,8 @@ module.exports = {
         type: Sequelize.STRING(200),
         allowNull: false,
       },
-      content: {
-        type: Sequelize.TEXT,
+      money: {
+        type: Sequelize.FLOAT,
         allowNull: true,
       },
       start_date: {

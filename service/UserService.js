@@ -51,9 +51,17 @@ let loginService = (email, password) => {
               "name",
               "phone",
               "role",
+              "createdAt",
+            ],
+            include: [
+              {
+                model: db.Role,
+                as: "roleInfo",
+                attributes: ["role_name"],
+              },
             ],
             where: { email: email },
-            raw: true,
+            // raw: true,
           });
           if (user) {
             let check = bcrypt.compareSync(password, user.password);
@@ -111,10 +119,10 @@ let createUserService = (inputData) => {
           password: hashPasswordFromBcrypt,
           role: inputData.role,
         });
-       
+
         resolve({
           errCode: 0,
-          errMessage: "Create success!!!"
+          errMessage: "Create success!!!",
         });
       }
     } catch (error) {

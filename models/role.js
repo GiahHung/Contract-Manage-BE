@@ -5,13 +5,15 @@ const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   class Role extends Model {
     static associate(models) {
-      // Ví dụ: Role.hasMany(models.User, { foreignKey: 'role' });
+      Role.hasMany(models.User, {
+        foreignKey: "role",
+        as: "users",
+      });
     }
   }
 
   Role.init(
     {
-      
       role_name: DataTypes.STRING(100),
     },
     {

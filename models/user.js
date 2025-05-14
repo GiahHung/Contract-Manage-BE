@@ -5,7 +5,10 @@ const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   class User extends Model {
     static associate(models) {
-      // User.hasMany(models.Contract, { foreignKey: 'employee_id' });
+      User.belongsTo(models.Role, {
+        foreignKey: "role",
+        as: "roleInfo", // alias khi include
+      });
     }
   }
 

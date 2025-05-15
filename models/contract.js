@@ -4,7 +4,33 @@ const { Model, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   class Contract extends Model {
-    static associate(models) {}
+    static associate(models) {
+      Contract.hasOne(models.LabourContract, {
+        foreignKey: "contract_id",
+        as: "labourDetail",
+        onDelete: "CASCADE",
+      });
+
+      // A contract can have one ConstructionContract
+      Contract.hasOne(models.ConstructionContract, {
+        foreignKey: "contract_id",
+        as: "constructionDetail",
+        onDelete: "CASCADE",
+      });
+
+      // A contract can have one CommercialContract
+      Contract.hasOne(models.CommercialContract, {
+        foreignKey: "contract_id",
+        as: "commercialDetail",
+        onDelete: "CASCADE",
+      });
+
+      // Optionally, a contract belongs to an Employee
+      Contract.belongsTo(models.User, {
+        foreignKey: "employee_id",
+        as: "employee",
+      });
+    }
   }
 
   Contract.init(

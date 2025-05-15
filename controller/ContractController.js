@@ -17,7 +17,26 @@ let createContract = async (req, res) => {
   }
 };
 
+let getAllContract = async (req, res) => {
+  try {
+    const { page, limit,sortField,sortOrder} = req.query;
+    const message = await ContractService.getAllContractService(
+      +page,
+      +limit,
+      sortField,
+      sortOrder
+    );
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      errCode: 1,
+      errMessage: "Error from server!!!",
+    });
+  }
+}
+
 module.exports = {
     createContract,
-  
+    getAllContract
 }

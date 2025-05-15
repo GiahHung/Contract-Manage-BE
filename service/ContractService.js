@@ -1,8 +1,5 @@
 const db = require("../models/index");
-const {
-  sequelize,
-
-} = require("../models");
+const { sequelize } = require("../models");
 const createContract = async (contractData) => {
   const t = await sequelize.transaction();
   return new Promise(async (resolve, reject) => {
@@ -18,7 +15,6 @@ const createContract = async (contractData) => {
           start_date: contractData.start_date,
           end_date: contractData.end_date,
           signed_date: contractData.signed_date,
-          
         },
         { transaction: t }
       );
@@ -77,6 +73,58 @@ const createContract = async (contractData) => {
   });
 };
 
+let getAllContractService = (page, limit, sortField, sortOrder) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const offset = (page - 1) * limit;
+      const direction = sortOrder.toUpperCase() === "ASC" ? "ASC" : "DESC";
+      const allowedFields = [
+        "id",
+        "createdAt",
+        "start_date",
+        "end_date",
+        "money",
+        "contract_code",
+      ];
+      const field = allowedFields.includes(sortField) ? sortField : "createdAt";
+      const result = await db.Contract.findAndCountAll({
+        limit,
+        offset,
+        order: [[field,direction]],
+        include: [
+          { model: db.LabourContract, as: "labourDetail", required: false },
+          {
+            model: db.ConstructionContract,
+            as: "constructionDetail",
+            required: false,
+          },
+          {
+            model: db.CommercialContract,
+            as: "commercialDetail",
+            required: false,
+          },
+          { model: db.User, as: "employee", required: false },
+        ],
+      });
+
+      const totalItems = result.count;
+      const totalPages = Math.ceil(totalItems / limit);
+      const contracts = result.rows;
+      resolve({
+        errCode: 0,
+        errMessage: "Get all contracts successfully",
+        totalItems,
+        totalPages,
+        contracts,
+        currentPage: +page,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
-    createContract,
-}
+  createContract,
+  getAllContractService,
+};

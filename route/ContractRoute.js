@@ -7,8 +7,14 @@ let initContractRouter = (app) => {
   router.post(
     "/api/contract/create-contract",
     validateToken,
-    AuthorizeRoles(1), // 1 là role admin (ví dụ)
+    AuthorizeRoles(1), 
     ContractController.createContract
+  );
+  router.get(
+    "/api/contract/get-all-contract",
+    validateToken,
+    AuthorizeRoles(1), 
+    ContractController.getAllContract
   );
 
   return app.use("/", router);

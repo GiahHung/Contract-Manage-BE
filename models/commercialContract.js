@@ -4,7 +4,13 @@ const { Model, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   class CommercialContract extends Model {
-    static associate(models) {}
+    static associate(models) {
+      CommercialContract.belongsTo(models.Contract, {
+        foreignKey: "contract_id",
+        as: "contract",
+        onDelete: "CASCADE",
+      });
+    }
   }
 
   CommercialContract.init(

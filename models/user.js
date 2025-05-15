@@ -9,6 +9,11 @@ module.exports = (sequelize) => {
         foreignKey: "role",
         as: "roleInfo", // alias khi include
       });
+      User.hasMany(models.Contract, {
+        foreignKey: "employee_id",
+        as: "contracts",
+        onDelete: "SET NULL",
+      });
     }
   }
 

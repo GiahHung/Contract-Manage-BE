@@ -49,6 +49,9 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: "pending",
       },
+      filepath: {
+        type: DataTypes.STRING,
+      },
     },
     {
       sequelize,

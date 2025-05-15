@@ -15,6 +15,7 @@ const createContract = async (contractData) => {
           start_date: contractData.start_date,
           end_date: contractData.end_date,
           signed_date: contractData.signed_date,
+          filepath: contractData.filepath,
         },
         { transaction: t }
       );

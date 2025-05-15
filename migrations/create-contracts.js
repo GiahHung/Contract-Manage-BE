@@ -51,6 +51,10 @@ module.exports = {
         allowNull: false,
         defaultValue: "pending",
       },
+      filepath:{
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       // Sequelize timestamps
       createdAt: {
         allowNull: false,

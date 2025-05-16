@@ -29,6 +29,12 @@ let initWebRouter = (app) => {
     AuthorizeRoles(1),
     UserController.deleteUser
   );
+  router.get(
+    "/api/user/get-list-role",
+    validateToken,
+    AuthorizeRoles(1),
+    UserController.getListRole
+  );
   return app.use("/", router);
 };
 

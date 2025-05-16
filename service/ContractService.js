@@ -125,7 +125,25 @@ let getAllContractService = (page, limit, sortField, sortOrder) => {
   });
 };
 
+let getListPaymentService = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await db.Payment.findAll({
+        attributes: ["id", "Payment_name"],
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "Get all payments successfully",
+        data: result,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   createContract,
   getAllContractService,
+  getListPaymentService,
 };

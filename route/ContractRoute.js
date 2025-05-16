@@ -16,6 +16,11 @@ let initContractRouter = (app) => {
     AuthorizeRoles(1), 
     ContractController.getAllContract
   );
+  router.get(
+    "/api/contract/get-list-payment",
+    validateToken,
+    ContractController.getListPayment
+  );
 
   return app.use("/", router);
 };

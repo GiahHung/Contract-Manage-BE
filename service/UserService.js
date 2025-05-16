@@ -239,6 +239,24 @@ let deleteUser = (userId) => {
     }
   });
 };
+
+let getListRoleService = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await db.Role.findAll({
+        attributes: ["id", "role_name"],
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "OK",
+        data,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 module.exports = {
   loginService: loginService,
   createUserService: createUserService,
@@ -246,4 +264,5 @@ module.exports = {
   editUserService: editUserService,
   getAllUsersService: getAllUsersService,
   getAllPageUsersService: getAllPageUsersService,
+  getListRoleService: getListRoleService,
 };

@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const initUserRouter = require("./route/UserRoute");
 const initContractRouter = require("./route/ContractRoute");
+const initCustomerRouter = require("./route/CustomerRoute");
 const connectDB = require("./config/connectDB");
 const cors = require("cors");
 require("dotenv").config();
@@ -21,6 +22,7 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json());
 initUserRouter(app);
 initContractRouter(app);
+initCustomerRouter(app);
 
 connectDB();
 

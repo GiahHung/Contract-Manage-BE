@@ -19,8 +19,8 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      payment_id: {
-        type: Sequelize.INTEGER,
+      payment: {
+        type: Sequelize.STRING(50),
         allowNull: false,
         unique: true,
       },

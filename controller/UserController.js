@@ -34,28 +34,20 @@ let login = async (req, res) => {
 };
 let getAllUsers = async (req, res) => {
   try {
-    if (req.query.page && req.query.limit) {
-      let page = req.query.page;
-      let limit = req.query.limit;
-      let user = await UserService.getAllPageUsersService(+page, +limit);
-      return res.status(200).json({
-        errCode: 0,
-        errMessage: "Success!!!",
-        user,
-      });
+    let { page, limit } = req.query;
+
+    if (page && limit) {
+      const user = await UserService.getAllPageUsersService(+page, +limit);
+      return res.status(200).json(user);
     } else {
-      let user = await UserService.getAllUsersService();
-      return res.status(200).json({
-        errCode: 0,
-        errMessage: "Success!!!",
-        user,
-      });
+      const user = await UserService.getAllUsersService();
+      return res.status(200).json(user);
     }
   } catch (e) {
-    console.log(e);
-    return res.status(200).json({
+    console.error("Error in getAllUsers:", e);
+    return res.status(500).json({
       errCode: 1,
-      errMessage: "Error from sever!!!",
+      errMessage: "Error from server!!!",
     });
   }
 };
@@ -103,7 +95,7 @@ let getListRole = async (req, res) => {
       errMessage: "Error from sever!!!",
     });
   }
-}
+};
 
 module.exports = {
   createUser: createUser,

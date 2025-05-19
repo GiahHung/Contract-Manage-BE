@@ -48,7 +48,7 @@ const createContract = async (contractData) => {
             {
               contract_id: contract.id,
               business_scope: contractData.business_scope,
-              payment_id: contractData.payment_id,
+              payment: contractData.payment,
             },
             { transaction: t }
           );
@@ -110,13 +110,13 @@ let getAllContractService = (page, limit, sortField, sortOrder) => {
 
       const totalItems = result.count;
       const totalPages = Math.ceil(totalItems / limit);
-      const contracts = result.rows;
+      const data = result.rows;
       resolve({
         errCode: 0,
         errMessage: "Get all contracts successfully",
         totalItems,
         totalPages,
-        contracts,
+        data,
         currentPage: +page,
       });
     } catch (e) {

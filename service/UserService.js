@@ -159,7 +159,7 @@ let getAllPageUsersService = (page, limit) => {
         errMessage: "Success!!!",
         total: count,
         totalPage: totalPage,
-        user: rows,
+        data: rows,
       });
     } catch (e) {
       reject(e);
@@ -172,10 +172,14 @@ let getAllUsersService = () => {
       let user = "";
       user = await db.User.findAll({
         attributes: {
-          exclude: ["password"],
+          exclude: ["password","role","email"],
         },
       });
-      resolve(user);
+      resolve({
+        errCode: 0,
+        errMessage: "OK",
+        data: user,
+      });
     } catch (e) {
       reject(e);
     }

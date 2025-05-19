@@ -123,13 +123,13 @@ let getCustomerWithPage = (page, limit, sortField, sortOrder) => {
       });
       const totalItems = customers.count;
       const totalPages = Math.ceil(totalItems / limit);
-      const customer = customers.rows;
+      const data = customers.rows;
       resolve({
         errCode: 0,
         errMessage: "Get all customer successfully",
         totalItems,
         totalPages,
-        customer,
+        data,
         currentPage: +page,
       });
     } catch (e) {

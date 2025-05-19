@@ -17,7 +17,7 @@ module.exports = (sequelize) => {
     {
       contract_id: DataTypes.INTEGER,
       business_scope: DataTypes.STRING(200),
-      payment_id: DataTypes.INTEGER,
+      payment: DataTypes.STRING(50),
     },
     {
       sequelize,

@@ -50,7 +50,7 @@ module.exports = (sequelize) => {
         defaultValue: "pending",
       },
       filepath: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT("long"),
       },
     },
     {

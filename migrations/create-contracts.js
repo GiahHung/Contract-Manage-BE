@@ -47,12 +47,12 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('pending','active','terminated'),
+        type: Sequelize.ENUM("pending", "active", "terminated"),
         allowNull: false,
         defaultValue: "pending",
       },
-      filepath:{
-        type: Sequelize.STRING,
+      filepath: {
+        type: Sequelize.TEXT("long"),
         allowNull: false,
       },
       // Sequelize timestamps

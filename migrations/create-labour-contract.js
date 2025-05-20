@@ -11,13 +11,11 @@ module.exports = {
       },
       contract_id: {
         type: Sequelize.INTEGER,
-
         allowNull: false,
       },
       position: {
         type: Sequelize.STRING(200),
         allowNull: false,
-        unique: true,
       },
       work_hour: {
         type: Sequelize.STRING(50),

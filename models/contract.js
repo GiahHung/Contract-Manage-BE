@@ -30,6 +30,12 @@ module.exports = (sequelize) => {
         foreignKey: "employee_id",
         as: "employee",
       });
+
+      Contract.hasMany(models.ContractLog, {
+        foreignKey: "contract_id",
+        as: "logs",
+        onDelete: "CASCADE",
+      });
     }
   }
 

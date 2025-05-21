@@ -1,9 +1,19 @@
 const db = require("../models/index");
 const { sequelize } = require("../models");
+const { getIO } = require("../middleware/socket");
 const createContract = async (contractData) => {
-  const t = await sequelize.transaction();
-  return new Promise(async (resolve, reject) => {
-    try {
+  console.log("iooooooooo", getIO);
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      const manager = await db.User.findOne({
+        where: { role: 3 },
+        transaction: t,
+      });
+      if (!manager) {
+        const err = new Error("No manager found for approval");
+        err.errCode = 3;
+        throw err;
+      }
       const contract = await db.Contract.create(
         {
           contract_code: contractData.contract_code,
@@ -16,12 +26,12 @@ const createContract = async (contractData) => {
           end_date: contractData.end_date,
           signed_date: contractData.signed_date,
           filepath: contractData.filepath,
+          manager_id: manager.id,
+          status: "pending",
         },
         { transaction: t }
       );
-
-      // 2. Tạo bản ghi chi tiết tuỳ loại hợp đồng
-      switch (contractData.type_id) {
+      switch (String(contractData.type_id)) {
         case "1": // Labour
           await db.LabourContract.create(
             {
@@ -33,7 +43,7 @@ const createContract = async (contractData) => {
           );
           break;
 
-        case "2": // Construction
+        case "2":
           await db.ConstructionContract.create(
             {
               contract_id: contract.id,
@@ -43,7 +53,7 @@ const createContract = async (contractData) => {
           );
           break;
 
-        case "3": // Commercial
+        case "3":
           await db.CommercialContract.create(
             {
               contract_id: contract.id,
@@ -53,25 +63,57 @@ const createContract = async (contractData) => {
             { transaction: t }
           );
           break;
-
         default:
-          resolve({
-            errCode: 2,
-            errMessage: "Invalid contract type",
-          });
+          const err = new Error("Invalid contract type");
+          err.errCode = 2;
+          throw err;
       }
-
-      // 3. Commit nếu mọi thứ OK
-      await t.commit();
-      resolve({
-        errCode: 0,
-        errMessage: "Create contract successfully",
+      await db.ContractLog.create(
+        {
+          contract_id: contract.id,
+          status: "pending",
+          performed_by: manager.id,
+          performed_at: new Date(),
+          action: "Create new contract",
+          created_by: contractData.employee_id,
+        },
+        { transaction: t }
+      );
+      const contractLog = db.ContractLog.findAll({
+        where: { contract_id: contract.id, status: "pending" },
+        include: [
+          {
+            model: db.Contract,
+            as: "contract",
+            attributes: ["title", "filepath"],
+          },
+          {
+            model: db.User,
+            as: "performer",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: db.User,
+            as: "creator",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+        transaction: t,
       });
-    } catch (e) {
-      await t.rollback();
-      reject(e);
+      const io = getIO();
+      io.to(`user_${manager.id}`).emit("newPendingContract", { contractLog });
+      return { errCode: 0, errMessage: "Create contract successfully" };
+    });
+
+    return result;
+  } catch (err) {
+    if (err.errCode) {
+      return { errCode: err.errCode, errMessage: err.message };
     }
-  });
+
+    // Nếu không, là lỗi hệ thống (500)
+    throw err;
+  }
 };
 
 let getAllContractService = (page, limit, sortField, sortOrder) => {
@@ -91,7 +133,7 @@ let getAllContractService = (page, limit, sortField, sortOrder) => {
       const result = await db.Contract.findAndCountAll({
         limit,
         offset,
-        order: [[field,direction]],
+        order: [[field, direction]],
         include: [
           { model: db.LabourContract, as: "labourDetail", required: false },
           {

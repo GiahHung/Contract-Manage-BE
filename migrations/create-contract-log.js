@@ -12,14 +12,13 @@ module.exports = {
       contract_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-       
       },
       action: {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
       performed_by: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       performed_at: {
@@ -31,7 +30,14 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      // Sequelize timestamps
+      status: {
+        type: Sequelize.STRING(50),
+        allowNull: false,
+      },
+      created_by: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

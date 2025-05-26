@@ -2,7 +2,6 @@ const db = require("../models/index");
 const { sequelize } = require("../models");
 const { getIO } = require("../middleware/socket");
 const createContract = async (contractData) => {
-  console.log("iooooooooo", getIO);
   try {
     const result = await sequelize.transaction(async (t) => {
       const manager = await db.User.findOne({
@@ -79,7 +78,7 @@ const createContract = async (contractData) => {
         },
         { transaction: t }
       );
-      const contractLog = db.ContractLog.findAll({
+      const contractLog = await db.ContractLog.findAll({
         where: { contract_id: contract.id, status: "pending" },
         include: [
           {
@@ -87,16 +86,16 @@ const createContract = async (contractData) => {
             as: "contract",
             attributes: ["title", "filepath"],
           },
-          {
-            model: db.User,
-            as: "performer",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: db.User,
-            as: "creator",
-            attributes: ["firstName", "lastName"],
-          },
+          // {
+          //   model: db.User,
+          //   as: "performer",
+          //   attributes: ["firstName", "lastName"],
+          // },
+          // {
+          //   model: db.User,
+          //   as: "creator",
+          //   attributes: ["firstName", "lastName"],
+          // },
         ],
         transaction: t,
       });
@@ -184,8 +183,33 @@ let getListPaymentService = () => {
   });
 };
 
+let getNotificationService = (status) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const data =await db.ContractLog.findAll({
+        where: { status: status },
+        include: [
+          {
+            model: db.Contract,
+            as: "contract",
+            attributes: ["title", "filepath"],
+          },
+        ],
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "success",
+        data: data,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   createContract,
   getAllContractService,
   getListPaymentService,
+  getNotificationService
 };

@@ -38,29 +38,9 @@ connectDB();
 
 // ...
 const server = http.createServer(app);
-const io = initSocket(server);
+initSocket(server);
 
-// Map để quản lý socket rooms theo userId (tuỳ chọn)
-const userSockets = new Map();
 
-// Event khi client connect
-io.on("connection", (socket) => {
-  console.log("New WS connection, socket id:", socket.id);
-
-  // Client phải emit sự kiện 'join' với userId để join room
-  socket.on("join", (userId) => {
-    socket.join(`user_${userId}`);
-    console.log(`Socket ${socket.id} joined room user_${userId}`);
-    // Lưu socket vào map nếu cần
-    if (!userSockets.has(userId)) userSockets.set(userId, []);
-    userSockets.get(userId).push(socket.id);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
-    // Bạn có thể dọn dẹp userSockets ở đây nếu muốn
-  });
-});
 
 
 module.exports = { server};

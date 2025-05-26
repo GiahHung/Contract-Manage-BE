@@ -127,8 +127,8 @@ let getCustomerWithPage = (page, limit, sortField, sortOrder) => {
       resolve({
         errCode: 0,
         errMessage: "Get all customer successfully",
-        totalItems,
-        totalPages,
+        total: totalItems,
+        totalPages: totalPages,
         data,
         currentPage: +page,
       });

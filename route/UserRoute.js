@@ -7,14 +7,14 @@ let initWebRouter = (app) => {
   router.post(
     "/api/user/create",
     validateToken,
-    AuthorizeRoles(1), // 1 là role admin (ví dụ)
+    AuthorizeRoles(1), 
     UserController.createUser
   );
   router.post("/api/user/login", UserController.login);
   router.get(
     "/api/user/get-all-user",
     validateToken,
-    AuthorizeRoles(1),
+    AuthorizeRoles(1,2),
     UserController.getAllUsers
   );
   router.put(

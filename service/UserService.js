@@ -61,7 +61,7 @@ let loginService = (email, password) => {
               },
             ],
             where: { email: email },
-            // raw: true,
+            raw: true,
           });
           if (user) {
             let check = bcrypt.compareSync(password, user.password);
@@ -69,7 +69,7 @@ let loginService = (email, password) => {
             const token =
               isCorrect &&
               jwt.sign(
-                { email: user.email, role: user.role },
+                { id: user.id, email: user.email, role: user.role },
                 process.env.SECRET_JWT,
                 {
                   expiresIn: "2h",
@@ -149,6 +149,13 @@ let getAllPageUsersService = (page, limit) => {
         attributes: {
           exclude: ["password"],
         },
+        include: [
+          {
+            model: db.Role,
+            as: "roleInfo",
+            attributes: ["role_name"],
+          },
+        ],
         offset: offset,
         limit: limit,
       });
@@ -158,7 +165,7 @@ let getAllPageUsersService = (page, limit) => {
         errCode: 0,
         errMessage: "Success!!!",
         total: count,
-        totalPage: totalPage,
+        totalPages: totalPage,
         data: rows,
       });
     } catch (e) {
@@ -172,7 +179,7 @@ let getAllUsersService = () => {
       let user = "";
       user = await db.User.findAll({
         attributes: {
-          exclude: ["password","role","email"],
+          exclude: ["password", "role", "email"],
         },
       });
       resolve({
@@ -259,7 +266,7 @@ let getListRoleService = () => {
       reject(e);
     }
   });
-}
+};
 
 module.exports = {
   loginService: loginService,

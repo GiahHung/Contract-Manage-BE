@@ -17,7 +17,6 @@ module.exports = {
       location: {
         type: Sequelize.STRING(200),
         allowNull: false,
-        unique: true,
       },
       createdAt: {
         allowNull: false,

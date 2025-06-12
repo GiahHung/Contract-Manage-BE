@@ -44,10 +44,10 @@ let editCustomer = async (req, res) => {
 };
 let deleteCustomer = async (req, res) => {
   try {
-    let message = await CustomerService.deleteCustomer(req.query.id);
+    let message = await CustomerService.deleteCustomerService(req.query.id);
     return res.status(200).json(message);
   } catch (error) {
-    console.log(e);
+    console.log(error);
     return res.status(500).json({
       errCode: -1,
       errMessage: "Error from server",

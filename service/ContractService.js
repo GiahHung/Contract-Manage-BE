@@ -1,6 +1,52 @@
 const db = require("../models/index");
 const { sequelize } = require("../models");
 const { getIO } = require("../middleware/socket");
+const handlebars = require("handlebars");
+const puppeteer = require("puppeteer");
+
+async function generateContractPdf(contract, data) {
+  // 1. Select template based on type
+  const templates = {
+    1: "labour.html",
+    2: "commercial.html",
+    3: "construction.html",
+  };
+  const templateFile = templates[data.type_id];
+  if (!templateFile) throw new Error("Invalid contract type for template");
+
+  // 2. Load HTML template
+  const templatePath = path.join(
+    __dirname,
+    "../templates/contracts",
+    templateFile
+  );
+  const source = fs.readFileSync(templatePath, "utf8");
+  const template = handlebars.compile(source);
+  const html = template({
+    ...data,
+    manager_id: contract.manager_id,
+    id: contract.id,
+  });
+
+  // 3. Ensure output directory exists
+  const outputDir = path.join(__dirname, "../public/contracts");
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
+  // 4. Launch Puppeteer & generate PDF
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setContent(html, { waitUntil: "networkidle0" });
+  const fileName = `contract_${contract.id}.pdf`;
+  const filePath = path.join(outputDir, fileName);
+  await page.pdf({ path: filePath, format: "A4" });
+  await browser.close();
+
+  // 5. Update contract record with filepath
+  const publicPath = `/contracts/${fileName}`;
+  await contract.update({ filepath: publicPath });
+  return publicPath;
+}
+
 const createContract = async (contractData) => {
   try {
     const result = await sequelize.transaction(async (t) => {
@@ -43,21 +89,21 @@ const createContract = async (contractData) => {
           break;
 
         case "2":
-          await db.ConstructionContract.create(
+          await db.CommercialContract.create(
             {
               contract_id: contract.id,
-              location: contractData.location,
+              business_scope: contractData.business_scope,
+              payment: contractData.payment,
             },
             { transaction: t }
           );
           break;
 
         case "3":
-          await db.CommercialContract.create(
+          await db.ConstructionContract.create(
             {
               contract_id: contract.id,
-              business_scope: contractData.business_scope,
-              payment: contractData.payment,
+              location: contractData.location,
             },
             { transaction: t }
           );
@@ -109,8 +155,70 @@ const createContract = async (contractData) => {
     if (err.errCode) {
       return { errCode: err.errCode, errMessage: err.message };
     }
+    throw err;
+  }
+};
+const updateContractService = async (updateData) => {
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      // 1. Lấy hợp đồng từ DB
+      const contract = await db.Contract.findOne({
+        where: { id: updateData.contract_id },
+        transaction: t,
+      });
+      if (!contract) {
+        const err = new Error("Contract not found");
+        err.errCode = 1;
+        throw err;
+      }
 
-    // Nếu không, là lỗi hệ thống (500)
+      // 3. Xác định trạng thái mới và action sẽ ghi vào log
+      let newStatus;
+      let action;
+      if (updateData.isApproved) {
+        newStatus = "complete";
+        action = "Approve contract";
+      } else {
+        newStatus = "reject";
+        action = "Reject contract";
+      }
+
+      // 4. Cập nhật trạng thái của hợp đồng
+      await contract.update({ status: newStatus }, { transaction: t });
+
+      // 5. Tạo một record mới trong ContractLog
+      await db.ContractLog.create(
+        {
+          contract_id: contract.id,
+          status: newStatus,
+          performed_by: updateData.manager_id,
+          performed_at: new Date(),
+          action: action,
+          note: updateData.note || "",
+          created_by: updateData.manager_id,
+        },
+        { transaction: t }
+      );
+
+      // 6. Đẩy thông báo real-time cho employee qua socket.io
+      const io = getIO();
+      io.to(`user_${contract.employee_id}`).emit("contractStatusUpdate", {
+        contract_id: contract.id,
+        status: newStatus,
+        message:
+          newStatus === "complete"
+            ? "Your contract has been approved."
+            : "Your contract has been rejected.",
+      });
+
+      return { errCode: 0, errMessage: "Update contract successfully" };
+    });
+
+    return result;
+  } catch (err) {
+    if (err.errCode) {
+      return { errCode: err.errCode, errMessage: err.message };
+    }
     throw err;
   }
 };
@@ -184,15 +292,15 @@ let getListPaymentService = () => {
 };
 
 let getNotificationService = (status) => {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const data =await db.ContractLog.findAll({
+      const data = await db.ContractLog.findAll({
         where: { status: status },
         include: [
           {
             model: db.Contract,
             as: "contract",
-            attributes: ["title", "filepath"],
+            attributes: ["title", "filepath", "contract_code"],
           },
         ],
       });
@@ -211,5 +319,6 @@ module.exports = {
   createContract,
   getAllContractService,
   getListPaymentService,
-  getNotificationService
+  getNotificationService,
+  updateContractService,
 };

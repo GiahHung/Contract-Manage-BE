@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hợp đồng Xây dựng</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    header { text-align: center; margin-bottom: 25px; }
+    .info { margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <header><h1>HỢP ĐỒNG XÂY DỰNG</h1></header>
+  <div class="info">
+    <strong>Số HĐ:</strong> {{contract_code}}<br>
+    <strong>Khách hàng:</strong> {{customer}}<br>
+    <strong>Địa điểm thi công:</strong> {{location}}
+  </div>
+  <div class="info">
+    <strong>Giá trị hợp đồng:</strong> {{money}} VND<br>
+    <strong>Tiêu đề:</strong> {{title}}
+  </div>
+  <div class="info">
+    <strong>Bắt đầu:</strong> {{start_date}}<br>
+    <strong>Kết thúc:</strong> {{end_date}}
+  </div>
+  <footer style="margin-top: 30px;">
+    <p>Ngày ký: {{signed_date}}</p>
+    <p>Người quản lý phê duyệt: {{manager_id}}</p>
+  </footer>
+</body>
+</html>

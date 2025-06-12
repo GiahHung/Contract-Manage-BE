@@ -51,7 +51,7 @@ module.exports = (sequelize) => {
       end_date: DataTypes.DATEONLY,
       signed_date: DataTypes.DATEONLY,
       status: {
-        type: DataTypes.ENUM("pending", "active", "completed", "cancelled"), // điều chỉnh giá trị phù hợp
+        type: DataTypes.ENUM("pending", "active", "completed", "cancelled","reject"),
         allowNull: false,
         defaultValue: "pending",
       },
